@@ -1,1 +1,1 @@
- 
+const target = 0
