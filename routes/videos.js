@@ -11,6 +11,18 @@ function readVideos(){
     return parsedVideos;
 }
 
+function findVideo(videoId){
+    const videos = readVideos()
+    const foundVideo = videos.find((video)=> video.id === videoId)
+    return foundVideo
+}
+
+function findVideoIndex(videoId){
+    const videos = readVideos()
+    const currentVideoIndex = videos.findIndex((video) => video.id === videoId)
+    return currentVideoIndex
+}
+
 //Return videos.json parsed on /videos request
 router.get('/', (req, res) => {
     res.status(200).json(readVideos())
@@ -19,7 +31,7 @@ router.get('/', (req, res) => {
 //Return video.json based on Id
 router.get("/:videoId", (req, res) => {
     const videos = readVideos()
-    const currentVideo = videos.find((video)=> video.id === req.params.videoId)
+    const currentVideo = findVideo(req.params.videoId)
     if(!currentVideo){res.status(404).send("The video with the given ID was not found.")}
     res.json(currentVideo)
 });
@@ -45,12 +57,14 @@ router.post('/', (req, res) => {
     res.status(200).send("New video posted!")
 })
 
+
 router.get('/:videoId/comments', (req, res) => {
     const videos = readVideos()
-    const currentVideo = videos.find((video)=> video.id === req.params.videoId)
+    const currentVideo = findVideo(req.params.videoId)
     res.json(currentVideo.comments)
 })
 
+//Endpoint to post comments to videoId comment array
 router.post('/:videoId/comments', (req, res) => {
     const newComment = {
         "id": uniqid(),
@@ -59,13 +73,23 @@ router.post('/:videoId/comments', (req, res) => {
         "likes": "0",
         "timestamp": req.body.timestamp
     }
-    const 
+    const videos = readVideos()
+    const currentVideo = findVideo(req.params.videoId)
+    const currentVideoIndex = findVideoIndex(req.params.videoId)
+    videos[currentVideoIndex].comments.push(newComment)
+    fs.writeFileSync('./data/videos.json', JSON.stringify(videos))
+    res.json(videos[currentVideoIndex].comments)
 })
+
 
 router.delete('/:videoId/comments/:commentId', (req, res) => {
     const videos = readVideos();
-    const currentVideo = videos.find((video)=> video.id === req.params.videoId)
-
+    const currentVideo = findVideo(req.params.videoId)
+    const currentVideoIndex = findVideoIndex(req.params.videoId)
+    const commentIndex = videos[currentVideoIndex].comments.findIndex((comment) => comment.id === req.params.commentId)
+    videos[currentVideoIndex].comments.splice(commentIndex, 1)
+    fs.writeFileSync('./data/videos.json', JSON.stringify(videos))
+    res.json(videos[currentVideoIndex].comments)
 })
 
 module.exports = router;
