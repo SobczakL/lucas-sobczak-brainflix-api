@@ -3,7 +3,7 @@ const app = express()
 const router = express.Router();
 const fs = require("fs");
 const uniqid = require("uniqid");
-const defaultImage = '../public/images/Upload-video-preview.jpg'
+// const defaultImage = '../public/images/Upload-video-preview.jpg'
 
 //Return video data
 function readVideos(){
@@ -43,29 +43,24 @@ router.get("/:videoId", (req, res) => {
 
 //New video post request
 router.post('/', (req, res) => {
+    const defaultImage = 'images/default.jpg'
+    const defaultVideo = 'https://project-2-api.herokuapp.com/stream'
     const newVideo = {
         "id": uniqid(),
         "title": req.body.title,
         "channel": req.body.channel,
-        "image": req.body.image ? req.body.image : defaultImage,
+        "image": defaultImage,
         "description": req.body.description,
         "views": 0,
         "likes": 0,
-        "duration": req.body.duration,
-        "video": req.body.video,
+        "duration": 10,
+        "video": defaultVideo,
         "timestamp": req.body.timestamp,
         "comments": []
     }
-    for(prop in newVideo){
-        if(!newVideo[prop]){
-            res.status(400).send(`Missing ${prop} in request body.`)
-        }
-    }
-    
     const videos = readVideos()
     videos.push(newVideo)
     fs.writeFileSync('./data/videos.json', JSON.stringify(videos))
-    res.json(videos)
     res.status(201).send("New video posted!")
 })
 
@@ -89,8 +84,8 @@ router.post('/:videoId/comments', (req, res) => {
         "likes": 0,
         "timestamp": req.body.timestamp
     }
-    for(prop in newVideo){
-        if(!newVideo[prop]){
+    for(prop in newComment){
+        if(!newComment[prop]){
             res.status(400).send(`Missing ${prop} in request body.`)
         }
     }
@@ -111,7 +106,7 @@ router.delete('/:videoId/comments/:commentId', (req, res) => {
     }
     const currentVideoIndex = findVideoIndex(req.params.videoId)
     const commentIndex = videos[currentVideoIndex].comments.findIndex((comment) => comment.id === req.params.commentId)
-    if(!commentIndex){
+    if(commentIndex === -1){
         res.status(404).send("A comment with the given ID was not found.")
     }
     videos[currentVideoIndex].comments.splice(commentIndex, 1)
