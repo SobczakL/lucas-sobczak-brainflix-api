@@ -2,7 +2,6 @@ const express = require("express");
 const app = express()
 const router = express.Router();
 const fs = require("fs");
-const { compileString } = require("sass");
 const uniqid = require("uniqid");
 const defaultImage = '../public/images/Upload-video-preview.jpg'
 
@@ -36,8 +35,10 @@ router.get('/',(req, res) => {
 router.get("/:videoId", (req, res) => {
     const videos = readVideos()
     const currentVideo = findVideo(req.params.videoId)
-    if(!currentVideo){res.status(404).send("The video with the given ID was not found.")}
-    res.json(currentVideo)
+    if(!currentVideo){
+        res.status(404).send("The video with the given ID was not found.")
+    }
+    res.status(200).json(currentVideo)
 });
 
 //New video post request
@@ -55,17 +56,26 @@ router.post('/', (req, res) => {
         "timestamp": req.body.timestamp,
         "comments": []
     }
+    for(prop in newVideo){
+        if(!newVideo[prop]){
+            res.status(400).send(`Missing ${prop} in request body.`)
+        }
+    }
+    
     const videos = readVideos()
     videos.push(newVideo)
     fs.writeFileSync('./data/videos.json', JSON.stringify(videos))
     res.json(videos)
-    res.status(200).send("New video posted!")
+    res.status(201).send("New video posted!")
 })
 
 
 router.get('/:videoId/comments', (req, res) => {
     const videos = readVideos()
     const currentVideo = findVideo(req.params.videoId)
+    if(!currentVideo){
+        res.status(404).send("The video with the given ID was not found.")
+    }
     res.json(currentVideo.comments)
 })
 
@@ -79,23 +89,34 @@ router.post('/:videoId/comments', (req, res) => {
         "likes": 0,
         "timestamp": req.body.timestamp
     }
+    for(prop in newVideo){
+        if(!newVideo[prop]){
+            res.status(400).send(`Missing ${prop} in request body.`)
+        }
+    }
     const videos = readVideos()
     const currentVideo = findVideo(req.params.videoId)
     const currentVideoIndex = findVideoIndex(req.params.videoId)
     videos[currentVideoIndex].comments.push(newComment)
     fs.writeFileSync('./data/videos.json', JSON.stringify(videos))
-    res.json(videos[currentVideoIndex].comments)
+    res.status(201).json(videos[currentVideoIndex].comments)
 })
 
 //Endpoint to delete comments based off videoId and commentId
 router.delete('/:videoId/comments/:commentId', (req, res) => {
     const videos = readVideos();
     const currentVideo = findVideo(req.params.videoId)
+    if(!currentVideo){
+        res.status(404).send("The video with the given ID was not found.")
+    }
     const currentVideoIndex = findVideoIndex(req.params.videoId)
     const commentIndex = videos[currentVideoIndex].comments.findIndex((comment) => comment.id === req.params.commentId)
+    if(!commentIndex){
+        res.status(404).send("A comment with the given ID was not found.")
+    }
     videos[currentVideoIndex].comments.splice(commentIndex, 1)
     fs.writeFileSync('./data/videos.json', JSON.stringify(videos))
-    res.json(videos[currentVideoIndex].comments)
+    res.status(204).json(videos[currentVideoIndex].comments)
 })
 
 module.exports = router;
