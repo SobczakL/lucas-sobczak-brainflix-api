@@ -1,22 +1,26 @@
 const express = require("express");
+const app = express()
 const router = express.Router();
 const fs = require("fs");
 const { compileString } = require("sass");
 const uniqid = require("uniqid");
 const defaultImage = '../public/images/Upload-video-preview.jpg'
 
+//Return video data
 function readVideos(){
     const videosJSON = fs.readFileSync('./data/videos.json')
     const parsedVideos = JSON.parse(videosJSON)
     return parsedVideos;
 }
 
+//Search videos array from id value
 function findVideo(videoId){
     const videos = readVideos()
     const foundVideo = videos.find((video)=> video.id === videoId)
     return foundVideo
 }
 
+//Search index of videoId in videos array
 function findVideoIndex(videoId){
     const videos = readVideos()
     const currentVideoIndex = videos.findIndex((video) => video.id === videoId)
@@ -24,7 +28,7 @@ function findVideoIndex(videoId){
 }
 
 //Return videos.json parsed on /videos request
-router.get('/', (req, res) => {
+router.get('/',(req, res) => {
     res.status(200).json(readVideos())
 })
 
@@ -44,8 +48,8 @@ router.post('/', (req, res) => {
         "channel": req.body.channel,
         "image": req.body.image ? req.body.image : defaultImage,
         "description": req.body.description,
-        "views": "0",
-        "likes": "0",
+        "views": 0,
+        "likes": 0,
         "duration": req.body.duration,
         "video": req.body.video,
         "timestamp": req.body.timestamp,
@@ -54,6 +58,7 @@ router.post('/', (req, res) => {
     const videos = readVideos()
     videos.push(newVideo)
     fs.writeFileSync('./data/videos.json', JSON.stringify(videos))
+    res.json(videos)
     res.status(200).send("New video posted!")
 })
 
@@ -68,9 +73,10 @@ router.get('/:videoId/comments', (req, res) => {
 router.post('/:videoId/comments', (req, res) => {
     const newComment = {
         "id": uniqid(),
+        "key": uniqid(),
         "name": req.body.name,
         "comment": req.body.comment,
-        "likes": "0",
+        "likes": 0,
         "timestamp": req.body.timestamp
     }
     const videos = readVideos()
@@ -81,7 +87,7 @@ router.post('/:videoId/comments', (req, res) => {
     res.json(videos[currentVideoIndex].comments)
 })
 
-
+//Endpoint to delete comments based off videoId and commentId
 router.delete('/:videoId/comments/:commentId', (req, res) => {
     const videos = readVideos();
     const currentVideo = findVideo(req.params.videoId)
