@@ -43,7 +43,7 @@ router.get("/:videoId", (req, res) => {
 
 //New video post request
 router.post('/', (req, res) => {
-    const defaultImage = 'images/default.jpg'
+    const defaultImage = 'http://localhost:8080/public/images/default.jpg'
     const defaultVideo = 'https://project-2-api.herokuapp.com/stream'
     const newVideo = {
         "id": uniqid(),
