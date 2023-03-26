@@ -1,15 +1,14 @@
-# lucas-sobczak-brainflix-api
+# **OVERVIEW**
 
-<!-- ---------------------------------------------------
-OVERVIEW
 The URL for the API is: http://localhost:8080/
----------------------------------------------------
-ROUTES
 
-GET /videos
-    - Returns an array of videos.
+---
+## **ROUTES**
+---
+### **GET** /videos
+ - Returns an array of videos.
 Response body example:
-[
+``` javascript [
     {
         "id": "84e96018-4022-434e-80bf-000ce4cd12b8",
         "title": "BMX Rampage: 2021 Highlights",
@@ -31,24 +30,27 @@ Response body example:
             }
         ]
     }
-]
----------------------------------------------------
-POST /videos
-    - Creates a new video object.
-    - Will return a 400 error code if 'title, 'channel', 'description', and 'timestamp are not provided in request.
-    - If successful, a response will return the videos array with the new video appended.
-Required Request Headers:
-Content-Type: application/json
+```
+---
+### **POST** /videos
+- Creates a new video object.
+- Will return a 400 error code if 'title, 'channel', 'description', and 'timestamp are not provided in request.
+- If successful, a response will return the videos array with the new video appended.
+
+Required Request Headers: Content-Type: application/json
 
 POST Body Example:
+```javascript
 {
     "title": "Video Title",
     "channel": "My Channel Name",
     "description": "This is a description.",
     "timestamp": "1626032763000",
 }
+```
 
 Response Body Example:
+```javascript
 {
     {
         "id": "84e96018-4022-434e-80bf-000ce4cd12b8",
@@ -64,20 +66,24 @@ Response Body Example:
         "comments": []
     }
 }
----------------------------------------------------
-POST /comments
-    - Creates a new comment
-    - Will return a 400 error code if 'name' and 'comment' are not included.
-Required Request Headers:
-Content-Type: application/json
+```
+---
+### **POST** /comments
+- Creates a new comment
+- Will return a 400 error code if 'name' and 'comment' are not included.
+
+Required Request Headers: Content-Type: application/json
 
 POST Body Example:
+```javascript
 {
     "name": "Bill",
     "comment": "First comment"
 }
+```
 
 Response Body Example:
+```javascript
 {
     {
         "id": "66b7d3c7-4023-47f1-a02c-520c9ca187a6",
@@ -87,14 +93,15 @@ Response Body Example:
         "timestamp": 1626011132000
     }
 }
----------------------------------------------------
-DELETE /comments/:id
-    - Deletes the comment identified by :id.
-        - Swap :id for the if of the element you want to delete.
-    - if successful, it will return an array of comments without comment that was just deleted.
+```
+---
+### **DELETE** /comments/:id
+- Deletes the comment identified by :id.
+    - Swap :id for the if of the element you want to delete.
+- if successful, it will return an array of comments without comment that was just deleted.
 
 Response Body Example 
-
+```javascript
 [
     {
         "id": "35bba08b-1b51-4153-ba7e-6da76b5ec1b9",
@@ -111,7 +118,8 @@ Response Body Example
         "timestamp": 1626359541000
     }
 ]
----------------------------------------------------
-DEPLOYMENT
-    - Initialize server using with NPM START
-    - It will return a message detailing that, 'Server is running on port: 8080' -->
+```
+---
+## **DEPLOYMENT**
+- Initialize server using with NPM START
+- It will return a message detailing that, 'Server is running on port: 8080'
